@@ -1,0 +1,256 @@
+<DOCTYPE! html>
+<html>
+<head>
+<title>Level: Easy </title>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.4/jquery.min.js"></script>
+
+<script type="text/javascript" src="https://static.codehs.com/gulp/db031e0d381ab08bda3b1de24d420be4c8c5f557/chs-js-lib/chs.js"></script>
+
+
+<br>
+<style>
+canvas {
+    border: 1px solid black;
+    display: inline-block;
+    vertical-align: top;
+}
+
+pre {
+    border: 1px solid black;
+    display: inline-block;
+    width: 500px;
+    height: 500px;
+    background-color: #F5F5F5;
+}
+    body {
+        background-color: #33ccff;
+}
+    body {
+        border-color: #ffffff;
+        border-width: 5px;
+        border-style: dashed;
+}
+</style>
+
+</head>
+
+<body>
+<h1>Create task </h1>
+
+<table style="width:100%" border="1">
+        <tr>
+        <th><a href="index.html">
+            <img src="http://www.clker.com/cliparts/0/d/H/0/t/i/home-logo-hi.png" width="50" height="50">
+        </a></th>
+        <th><a href= "game.html">Easy</a></th>
+        
+        
+        <th><a href= "med.html">Medium</a></th>
+        
+        
+        <th><a href= "hard.html">Hard</a></th>
+        
+        
+        <th><a href= "impos.html">Impossible</a></th>
+        </tr>
+    </table>
+    
+<br>
+<br>
+<canvas
+width="400"
+height="500"
+class="codehs-editor-canvas"></canvas>
+<pre id="console"></pre>
+
+<script>
+window.onload = function() {
+
+    var character;
+var obstacle;
+var time = 0;
+var timer;
+
+var dx = 5.5;
+var dy = 5.5;
+function start(){
+    setup();
+    keyDownMethod(keyDown);
+    
+// setTimer(game, 5);
+}
+function setup(){
+    //This allows the user to pick the color of the character form three colors
+    var color = readLine("Pick the color for the character. Either red, green, or blue: ");
+    //This sets up a secret easter egg
+    if(color == "john"){
+        setTimer(easteregg, 5);
+}
+    if(background == "chris"){
+        setTimer(easteregg, 5);
+}
+//If the color is not red, blue, green
+    if(color == "red" || color == "blue" || color == "green"){
+    } else {
+        color = Randomizer.nextColor();
+}
+//asks the user what they want for their background color
+    var background = readLine("What should the color be for the background: ");
+// This sets the background as a random color if not blue, green, or red
+    if(background == "red" || background == "blue" || background == "green"){
+    } else {
+        background = Randomizer.nextColor();
+    }
+        setBackgroundColor(background);
+
+//Creates the character of the game
+    character = new Rectangle(50, 50);
+    character.setPosition(100, 350);
+    character.setColor(color);
+    add(character);
+
+    addObstacle();
+    setTimer(game, 30);
+    setTimer(timer, 1000);
+}
+function game(){
+    checkWalls();
+    obstacle.move(dx, dy);
+    var collider = getCollider();
+    if(collider != null && collider != character && collider != timer){
+        lose();
+    return;
+}
+    dx += 0.01;
+    dy += 0.01; 
+}
+function keyDown(e){
+if(e.keyCode == Keyboard.DOWN || e.keyCode == Keyboard.letter('s')){
+character.move(0, 25);
+}
+if(e.keyCode == Keyboard.LEFT || e.keyCode == Keyboard.letter('a')){
+character.move(-25, 0);
+}
+if(e.keyCode == Keyboard.UP || e.keyCode == Keyboard.letter('w')){
+character.move(0, -25);
+}
+if(e.keyCode == Keyboard.RIGHT || e.keyCode == Keyboard.letter('d')){
+character.move(25, 0);
+}
+}
+function easteregg(){
+var egg = new Text("YOU WIN!!!!!!");
+egg.setColor(Color.YELLOW);
+egg.setPosition((getWidth() - egg.getWidth()) / 3, getHeight() / 2);
+add(egg);
+
+var eas = new Oval(40, 80);
+eas.setColor(Color.YELLOW);
+eas.setPosition(getWidth() / 2, getHeight() / 3);
+add(eas);
+}
+function addObstacle(){
+obstacle = new Circle(20);
+obstacle.setPosition(120, 120);
+
+add(obstacle);
+}
+function checkWalls(){
+// Bounce off right wall
+if(obstacle.getX() + obstacle.getRadius() > getWidth()){
+dx = -dx;
+}
+
+// Bounce off left wall
+if(obstacle.getX() - obstacle.getRadius() < 0){
+dx = -dx;
+}
+
+// Bounce off bottom wall
+if(obstacle.getY() + obstacle.getRadius() > getHeight()){
+dy = -dy;
+}
+
+// Bounce off top wall
+if(obstacle.getY() - obstacle.getRadius() < 0){
+dy = -dy;
+}
+}
+function getCollider(){
+// checks if the top left corner is colliding with the obstacle
+var TLC = getElementAt(character.getX() - 1, character.getY() - 1);
+if(TLC != null){
+return TLC;
+}
+
+var TRC = getElementAt(character.getX() + character.getWidth() + 1, character.getY() - 1);
+if(TRC != null){
+return TRC;
+}
+var BLC = getElementAt(character.getX() - 1, character.getY() + character.getHeight() + 1);
+if(BLC != null){
+return BLC;
+}
+var BRC = getElementAt(character.getX() + character.getWidth() + 1, character.getY + character.getHeight() + 1);
+if(BRC != null){
+return BRC;
+}
+
+return null;
+}
+function lose(){
+    stopTimer("game");
+    stopTimer("timer");
+
+    var text = new Text("You Lost!");
+    text.setColor(Color.BLACK);
+    text.setPosition(getWidth() / 2 - text.getWidth() / 2, getHeight() / 2);
+    add(text);
+
+    again();
+}
+function timer(){
+time++;
+
+remove(timer);
+timer = new Text("Timer: " + time);
+timer.setPosition(getWidth() / 3, getHeight() / 3);
+timer.setColor(Color.BLACK);
+add(timer);
+
+
+}
+/* function again(){
+    var again = readBoolean("Do you want to play again?");
+    if(again == true){
+        start();
+    }else{
+        return;
+    }
+}
+
+function level(){
+    
+}
+*/
+function characterBound(){
+    var TLC = getElementAt(character.getX() - 1, character.getY() - 1);
+    var TRC = getElementAt(character.getX() + character.getWidth() + 1, character.getY() - 1);
+    var BLC = getElementAt(character.getX() - 1, character.getY() + character.getHeight() + 1);
+    var BRC = getElementAt(character.getX() + character.getWidth() + 1, character.getY + character.getHeight() + 1);
+    
+    if(character.getX > getWidth){
+        lose();
+    }
+}
+
+    if (typeof start === 'function') {
+        start();
+    }
+};
+</script>
+
+</body>
+</html>
+</DOCTYPE>
